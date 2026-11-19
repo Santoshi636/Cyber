@@ -15,7 +15,8 @@ for _, event in suspicious_events.iterrows():
         event["event_id"],
         source_ip=event["source_ip"],
         threat_type=event["threat_type"],
-        severity=event["severity"]
+        severity=event["severity"],
+        failed_logins=event["failed_logins"]
     )
 
 for i in range(len(suspicious_events)):
@@ -38,8 +39,8 @@ severity_rank = {
     "Critical": 4
 }
 
-print("\nCYBERSENTINEL AI - ATTACK GROUP ANALYSIS")
-print("-----------------------------------------")
+print("\nCYBERSENTINEL AI - ATTACK GROUP RISK ANALYSIS")
+print("------------------------------------------------")
 
 group_number = 0
 
@@ -51,29 +52,41 @@ for group in groups:
 
         highest_severity = max(
             events,
-            key=lambda event: severity_rank.get(
-                event["severity"], 0
-            )
+            key=lambda event: severity_rank.get(event["severity"], 0)
         )["severity"]
+
+        total_failed_logins = sum(
+            event["failed_logins"] for event in events
+        )
+
+        # Calculate group risk score
+        severity_score = severity_rank[highest_severity] * 15
+        event_score = min(len(group) * 10, 30)
+        login_score = min(total_failed_logins, 40)
+
+        risk_score = min(
+            severity_score + event_score + login_score,
+            100
+        )
+
+        if risk_score >= 80:
+            risk_level = "Critical"
+        elif risk_score >= 60:
+            risk_level = "High"
+        elif risk_score >= 30:
+            risk_level = "Medium"
+        else:
+            risk_level = "Low"
 
         source_ip = events[0]["source_ip"]
 
-        threats = sorted(set(
-            event["threat_type"] for event in events
-        ))
-
         print(f"\nAttack Group {group_number}")
-        print("Total Events:", len(group))
         print("Source IP:", source_ip)
-        print("Group Severity:", highest_severity)
-        print("Possible Threats:", ", ".join(threats))
-
-        print(
-            "Explanation:",
-            f"{len(group)} suspicious events share the same",
-            f"source IP ({source_ip}).",
-            "This may indicate coordinated suspicious activity."
-        )
+        print("Total Events:", len(group))
+        print("Highest Severity:", highest_severity)
+        print("Total Failed Logins:", total_failed_logins)
+        print("Risk Score:", risk_score, "/ 100")
+        print("Risk Level:", risk_level)
 
         print("Related Events:", ", ".join(sorted(group)))
 
