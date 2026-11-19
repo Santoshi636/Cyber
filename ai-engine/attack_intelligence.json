@@ -1,0 +1,24 @@
+[
+    {
+        "attack_group": 1,
+        "source_ip": "192.168.1.20",
+        "related_events": [
+            "EVT004",
+            "EVT006",
+            "EVT009"
+        ],
+        "possible_threats": [
+            "Possible Brute Force Attack"
+        ],
+        "severity": "Critical",
+        "total_events": 3,
+        "total_failed_logins": 92,
+        "explanation": "3 suspicious events were detected from the same source IP address 192.168.1.20. These events contain 92 failed login attempts out of 95 total login attempts. This pattern may indicate a coordinated brute-force attack.",
+        "recommendations": [
+            "Investigate the source IP address.",
+            "Review authentication logs for affected accounts.",
+            "Check whether any login attempts were successful.",
+            "Consider temporary IP blocking after verification."
+        ]
+    }
+]
