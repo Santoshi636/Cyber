@@ -4,3 +4,5 @@ __pycache__/
 *.pyc
 .env
 analysis_results.csv
+node_modules/
+.DS_Store
